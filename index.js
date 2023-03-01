@@ -35,6 +35,16 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+
+// Routes
+// import {authRoutes } from'./routes/auth'
+// app.use('/api/auth',authRoutes)
+// app.post("api/auth/",upload.single("picture"),authRoutes)
+
+
+
+
+// Port
 const PORT=process.env.PORT || 6000
 mongoose.connect(process.env.MONGODB_URL,{
     useNewUrlParser:true,
