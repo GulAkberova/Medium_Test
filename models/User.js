@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const UserSchema= new mongoose.Schema(
     {
@@ -39,6 +39,18 @@ const UserSchema= new mongoose.Schema(
         occupation:String,
         viewedProfile:Number,
         impressions:Number,
+     
+          savedPosts: [
+            {
+              type: Schema.Types.ObjectId,
+              ref: "Post",
+            },
+           
+          ],
+          isDeleted:{
+            type: Boolean,
+            default: false,
+          },
     },
     {timestamps:true}
 );

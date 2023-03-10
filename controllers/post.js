@@ -6,17 +6,19 @@ import User from "../models/User.js";
 // Create
 export const createPost=async(req,res)=>{
     try{
-        const {userId, description, picturePath}=req.body;
+        const {userId, description, picturePath,title}=req.body;
         const user = await User.findById(userId)
         const newPost= new Post({
             userId,
             firstName:user.firstName,
             lastName:user.lastName,
             location:user.location,
+            occupation:user.occupation,
+            title,
             description,
             userPicturePath:user.picturePath,
             picturePath,
-            likes:{},
+            likes:[],
             comments:[]
 
         })
@@ -36,7 +38,7 @@ export const createPost=async(req,res)=>{
 
 export const getFeedPost= async(req,res)=>{
     try{
-        const post = await Post.find()
+        const post = await Post.find().sort({ date: 'desc' }).exec()
         res.status(200).json(post);
 
     }catch(err){
@@ -57,6 +59,18 @@ export const getUserPost= async (req,res)=>{
 
     }
 }
+// export const getUserId= async(req,res)=>{
+//     try{
+//         const {userId}= req.params;
+//         const user = await User.find({userId})
+//         res.status(200).json(user);
+
+//     }catch(err){
+//         res.status(404).json({message: err.message})
+
+//     }
+
+// }
 export const getUserPostDetail=async(req,res)=>{
     try {
         const { id } = req.params;
@@ -70,29 +84,54 @@ export const getUserPostDetail=async(req,res)=>{
 // Update
 
 export const likePost= async(req, res)=>{
-    try{
-        const {id}=req.params;
+    const {id}=req.params;
         const {userId}=req.body;
-        const post=await Post.findById(id);
-        const isLiked=post.likes.get(userId)
+    Post.findByIdAndUpdate(id, { $addToSet: { likes: userId } }, { new: true })
+  .then((doc) => {
+    res.json(doc);
+  })
+  .catch((error) => {
+    res.status(500).json(error);
+  });
 
-        if(isLiked){
-            post.likes.delete(userId)
-        }else{
-            post.likes.set(userId,true)
+}
 
-        }
+export const dislikePost= async(req, res)=>{
+ 
+    const {id}=req.params;
+    const {userId}=req.body;
+    Post.findByIdAndUpdate(id, { $pull: { likes: userId } }, { new: true })
+  .then((doc) => {
+    res.json(doc);
+  })
+  .catch((error) => {
+    res.status(500).json(error);
+  });
 
-        const updatedPost= await Post.findByIdAndUpdate(
+}
+export const comment= async(req, res)=>{
+    const {id}=req.params;
+    const {userId}=req.body;
+    const comment = {
+        user: userId,
+        comment: req.body.comment,
+      };
+
+      try {
+        const updatedPost = await Post.findByIdAndUpdate(
             id,
-            {likes:post.likes},
-            {new:true}
-        )
-        res.status(200).json(updatedPost);
-
-    }catch(err){
-        res.status(404).json({message: err.message})
-
-    }
+          { $addToSet: { comments: comment } },
+          { new: true }
+        ).populate({
+            path: "comments",
+            populate: [
+              { path: "user", select: "_id firstName" }
+            ],
+          })
+          .exec();
+        res.json(updatedPost);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
 
 }

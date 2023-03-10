@@ -1,4 +1,28 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+const commentSchema = new Schema(
+    {
+        comment: {
+            type: String,
+          },
+
+        user:{
+            type:Schema.Types.ObjectId,
+            ref:"User"
+        },
+    },
+    { timestamps: true }
+  );
+  
+  commentSchema.virtual("firstName", {
+    ref: "User",
+    localField: "user",
+    foreignField: "_id",
+    justOne: true,
+    select: "firstName",
+  });
+
+  const Comment = mongoose.model("Comment", commentSchema);
+
 const PostSchema=mongoose.Schema(
     {
         userId:{
@@ -13,18 +37,27 @@ const PostSchema=mongoose.Schema(
             type:String,
             required:true
         },
+        friends:{
+            type:Array,
+            default:[
+               
+            ]
+        },
+        occupation:String,
         location:String,
+        title:String,
         description:String,
         picturePath:String,
         userPicturePath:String,
-        likes:{
-            type:Map,
-            of:Boolean,
-        },
-        comments:{
-            types:Array,
-            default:[]
-        }
+        readProfile:Number,
+        likes: [
+            {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+            },
+          ],
+        comments: [commentSchema],
+        
 
     },
     {timestamps:true}
