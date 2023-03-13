@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 
 // Read
 export const getAllUser = async (req, res) => {
@@ -78,5 +79,49 @@ export const addRemoveFriend=async(req,res)=>{
     res.status(404).json({ message: err.message });
 
     }
+
+}
+
+
+// Follow
+export const followUser=async(req,res)=>{
+    const { id, followUserId } = req.body;
+    try {
+        await User.updateOne(
+          { _id: id },
+          { $push: { following: followUserId } }
+        );
+        await User.updateOne(
+          { _id: followUserId },
+          { $push: { followers: id } }
+        );
+        res.json({ message: "User followed successfully" });
+      } catch (err) {
+        res.status(500).json(err);
+      }
+
+}
+export const unfollowUser=async(req,res)=>{
+    const { id, followUserId } = req.body;
+    try {
+    await User.updateOne(
+        { _id: id },
+        { $pull: { following: followUserId } }
+      );
+      await User.updateOne(
+        { _id: followUserId },
+        { $pull: { followers: id } }
+      );
+      res.json({ message: "User unfollowed successfully" });
+    }  catch (err) {
+        res.status(500).json(err);
+      }
+    
+}
+
+
+export const savePost=async(req,res)=>{
+
+   
 
 }

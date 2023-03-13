@@ -35,6 +35,18 @@ const UserSchema= new mongoose.Schema(
             type:Array,
             default:[]
         },
+        followers: [
+            {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+            },
+          ],
+          following: [
+            {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+            },
+          ],
         location:String,
         occupation:String,
         viewedProfile:Number,

@@ -4,6 +4,9 @@ import {
     getUserFriends,
     addRemoveFriend,
     getAllUser,
+    unfollowUser,
+    followUser,
+    savePost
 
 }from "../controllers/user.js"
 import { verifyToken } from '../middleware/auth.js'
@@ -19,6 +22,10 @@ router.get("/:id/friends",getUserFriends)
 router.patch("/:id/:friendId",addRemoveFriend)
 
 
+// Follow
+router.post("/follow",followUser);
+router.post("/unfollow", unfollowUser);
 
 
+router.post("/:id/save-post/:postId", savePost);
 export default router
