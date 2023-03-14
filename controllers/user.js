@@ -122,6 +122,29 @@ export const unfollowUser=async(req,res)=>{
 
 export const savePost=async(req,res)=>{
 
-   
+  const { userId, postId } = req.params;
+
+  try {
+    const user = await User.findById(id);
+    const post = await Post.findById(postId);
+    if (!user || !post) {
+      throw new Error("User or post not found");
+    }
+  
+    const postIndex = User.savedPosts.indexOf(postId);
+    if (postIndex === -1) {
+      User.savedPosts.push(postId);
+    } else {
+      User.savedPosts.splice(postIndex, 1);
+    }
+  
+    await User.save();
+  
+    res.json({ message: "Post saved successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+  
 
 }
